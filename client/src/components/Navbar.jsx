@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { GoogleLogin } from '@react-oauth/google';
 import { assets } from '../assets/assets';
+import { toast } from 'react-hot-toast';
 
 const Navbar = () => {
   const navigate = useNavigate(); 
   const { axios } = useAppContext(); 
   
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') !== 'light';
   });
@@ -40,25 +40,21 @@ const Navbar = () => {
               localStorage.setItem('userEmail', data.user.email || '');
               localStorage.setItem('userRole', data.user.role || 'Writer');
 
-              setShowAuthModal(false);
               if (data.user.role === 'Admin') {
                 localStorage.setItem('token', data.token);
+              }
+              const existingPhone = localStorage.getItem('userPhone');
+              if (data.user.role !== 'Admin' && !existingPhone) {
+                navigate('/complete-profile');
+              } else {
                 navigate('/');
                 window.location.reload();
-              } else {
-                const existingPhone = localStorage.getItem('userPhone');
-                if (!existingPhone) {
-                  navigate('/complete-profile');
-                } else {
-                  navigate('/');
-                  window.location.reload();
-                }
               }
           } else {
-              alert(data.message);
+              toast.error(data.message || 'Login failed');
           }
       } catch (error) {
-          alert(error.message);
+          toast.error(error.response?.data?.message || error.message || 'Google Login failed');
       }
   };
 
@@ -80,7 +76,6 @@ const Navbar = () => {
       localStorage.setItem('token', demoToken);
     }
 
-    setShowAuthModal(false);
     navigate(isDemoAdmin ? '/admin' : '/dashboard');
     window.location.reload();
   };
@@ -111,14 +106,24 @@ const Navbar = () => {
             {isDarkMode ? '🌙' : '☀️'}
           </button>
 
-          {/* Sign In Button when NOT logged in */}
+          {/* Direct Sign In Options in Top Navbar (No Center Modal) */}
           {!hasUserToken ? (
-            <button 
-              onClick={() => setShowAuthModal(true)}
-              className="rounded-xl cursor-pointer h-[40px] px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2"
-            >
-              <span>✨</span> Sign In / Join
-            </button>
+            <div className="flex items-center gap-2">
+              <GoogleLogin 
+                onSuccess={handleUserGoogleSuccess} 
+                onError={() => toast.error('Google Sign-In failed')}
+                theme="filled_blue"
+                shape="pill"
+                size="medium"
+              />
+              <button
+                onClick={() => handleDemoLogin('Writer')}
+                title="Quick Demo Sign In"
+                className="bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 text-xs px-3.5 py-2 rounded-full transition font-semibold flex items-center gap-1 cursor-pointer shadow-sm"
+              >
+                <span>✍️</span> Demo
+              </button>
+            </div>
           ) : (
             /* Logged In User / Admin Dropdown */
             <div className="relative">
@@ -205,65 +210,6 @@ const Navbar = () => {
           )}
         </div>
       </div>
-
-      {/* Sign In Modal */}
-      {showAuthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 sm:p-8 text-slate-100 shadow-2xl relative animate-in fade-in duration-200">
-            <button
-              onClick={() => setShowAuthModal(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer"
-            >
-              ✕
-            </button>
-
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-extrabold text-white flex items-center justify-center gap-2">
-                <span>✨</span> Welcome to InkVerse
-              </h3>
-              <p className="text-xs text-slate-400 mt-1.5">Sign in to create, publish, and manage your articles</p>
-            </div>
-
-            {/* Google OAuth Login */}
-            <div className="bg-slate-950/70 p-5 rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center">
-              <p className="text-xs font-bold text-slate-200 mb-3 tracking-wide uppercase">Sign In With Google</p>
-              <div className="flex justify-center items-center w-full min-h-[44px]">
-                <GoogleLogin 
-                  onSuccess={handleUserGoogleSuccess} 
-                  onError={() => alert('Google Login Failed: Please verify authorized JavaScript origins in Google Cloud Console.')}
-                  theme="filled_blue"
-                  shape="pill"
-                  size="large"
-                  width="300"
-                />
-              </div>
-              <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
-                <span className="text-amber-400 font-semibold">ℹ️ Live domain info:</span> Ensure your live URL is added under <span className="text-slate-300 font-mono">Authorized JavaScript Origins</span> in Google Cloud Console.
-              </p>
-            </div>
-
-            <div className="flex items-center my-5 before:flex-1 before:border-t before:border-slate-800 after:flex-1 after:border-t after:border-slate-800">
-              <p className="mx-3 text-center font-bold text-slate-500 text-[11px] tracking-wider uppercase">OR DEMO ACCESS</p>
-            </div>
-
-            {/* Quick Demo Login Options */}
-            <div className="space-y-3">
-              <button
-                onClick={() => handleDemoLogin('Writer')}
-                className="w-full bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-semibold text-xs py-3.5 rounded-2xl border border-slate-700 transition cursor-pointer flex items-center justify-center gap-2 shadow-md"
-              >
-                <span>✍️</span> Continue as Demo Writer
-              </button>
-              <button
-                onClick={() => handleDemoLogin('Admin')}
-                className="w-full bg-indigo-600/20 hover:bg-indigo-600/35 text-indigo-300 font-semibold text-xs py-3.5 rounded-2xl border border-indigo-500/40 transition cursor-pointer flex items-center justify-center gap-2 shadow-md"
-              >
-                <span>🛡️</span> Continue as Demo Admin
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </nav>
   );
 };
