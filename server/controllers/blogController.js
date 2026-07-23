@@ -24,7 +24,7 @@ export const addBlog = async (req, res)=>{
             return res.json({success: false, message: "Missing required fields"})
         }
 
-        const fileBuffer = fs.readFileSync(imageFile.path)
+        const fileBuffer = imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : null);
 
         const response = await imagekit.upload({
             file: fileBuffer,
@@ -170,7 +170,7 @@ export const userAddBlog = async (req, res) => {
             return res.json({ success: false, message: "Missing required fields" })
         }
 
-        const fileBuffer = fs.readFileSync(imageFile.path)
+        const fileBuffer = imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : null);
 
         const response = await imagekit.upload({
             file: fileBuffer,
@@ -260,7 +260,7 @@ export const updateBlogById = async (req, res) => {
         }
 
         if (imageFile) {
-            const fileBuffer = fs.readFileSync(imageFile.path);
+            const fileBuffer = imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : null);
             const response = await imagekit.upload({
                 file: fileBuffer,
                 fileName: imageFile.originalname,
