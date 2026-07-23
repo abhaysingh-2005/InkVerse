@@ -225,35 +225,38 @@ const Navbar = () => {
             </div>
 
             {/* Google OAuth Login */}
-            <div className="flex flex-col items-center justify-center gap-3 mb-6 bg-slate-950/60 p-5 rounded-2xl border border-slate-800 text-center">
-              <p className="text-xs font-semibold text-slate-300 mb-1">Sign in with Google</p>
-              <GoogleLogin 
-                onSuccess={handleUserGoogleSuccess} 
-                onError={() => alert('Google Login Failed: Please check authorized JavaScript origins in Google Cloud Console.')}
-                theme="filled_blue"
-                shape="pill"
-                size="large"
-              />
-              <p className="text-[11px] text-slate-400 mt-2">
-                <span className="text-amber-400 font-semibold">ℹ️ Live domain notice:</span> If Google displays <code className="text-amber-300">origin_mismatch</code> error, add your Vercel URL to Authorized Javascript Origins in Google Console, or use Quick Demo below.
+            <div className="bg-slate-950/70 p-5 rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center">
+              <p className="text-xs font-bold text-slate-200 mb-3 tracking-wide uppercase">Sign In With Google</p>
+              <div className="flex justify-center items-center w-full min-h-[44px]">
+                <GoogleLogin 
+                  onSuccess={handleUserGoogleSuccess} 
+                  onError={() => alert('Google Login Failed: Please verify authorized JavaScript origins in Google Cloud Console.')}
+                  theme="filled_blue"
+                  shape="pill"
+                  size="large"
+                  width="300"
+                />
+              </div>
+              <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
+                <span className="text-amber-400 font-semibold">ℹ️ Live domain info:</span> Ensure your live URL is added under <span className="text-slate-300 font-mono">Authorized JavaScript Origins</span> in Google Cloud Console.
               </p>
             </div>
 
-            <div className="flex items-center my-4 before:flex-1 before:border-t before:border-slate-800 after:flex-1 after:border-t after:border-slate-800">
-              <p className="mx-3 text-center font-semibold text-slate-500 text-xs">OR QUICK DEMO</p>
+            <div className="flex items-center my-5 before:flex-1 before:border-t before:border-slate-800 after:flex-1 after:border-t after:border-slate-800">
+              <p className="mx-3 text-center font-bold text-slate-500 text-[11px] tracking-wider uppercase">OR DEMO ACCESS</p>
             </div>
 
             {/* Quick Demo Login Options */}
             <div className="space-y-3">
               <button
                 onClick={() => handleDemoLogin('Writer')}
-                className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs py-3 rounded-xl border border-slate-700 transition cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-semibold text-xs py-3.5 rounded-2xl border border-slate-700 transition cursor-pointer flex items-center justify-center gap-2 shadow-md"
               >
                 <span>✍️</span> Continue as Demo Writer
               </button>
               <button
                 onClick={() => handleDemoLogin('Admin')}
-                className="w-full bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 font-semibold text-xs py-3 rounded-xl border border-indigo-500/40 transition cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-indigo-600/20 hover:bg-indigo-600/35 text-indigo-300 font-semibold text-xs py-3.5 rounded-2xl border border-indigo-500/40 transition cursor-pointer flex items-center justify-center gap-2 shadow-md"
               >
                 <span>🛡️</span> Continue as Demo Admin
               </button>
