@@ -32,15 +32,14 @@ export const AppProvider = ({ children })=>{
         setRefreshTrigger(prev => prev + 1);
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         fetchBlogs();
-        const token = localStorage.getItem('token')
-        if(token){
-            setToken(token);
-            axios.defaults.headers.common['Authorization']=`${token}`;
-
+        const storedToken = localStorage.getItem('userToken') || localStorage.getItem('token');
+        if (storedToken) {
+            setToken(storedToken);
+            axios.defaults.headers.common['Authorization'] = storedToken.startsWith('Bearer ') ? storedToken : `Bearer ${storedToken}`;
         }
-    },[])
+    }, []);
 
 
     const value ={
