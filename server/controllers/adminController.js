@@ -3,7 +3,12 @@ import Blog  from '../models/Blog.js'
 import Comment from '../models/Comment.js'
 import { OAuth2Client } from 'google-auth-library'
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "abhaysingh787569@gmail.com";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Rajawat@123";
+const JWT_SECRET = process.env.JWT_SECRET || "JAI HIND";
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "363221562943-smiddvk5eqifmpj4b9gemki95k1a74i3.apps.googleusercontent.com";
+
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 
 // function to allow user login to applicationn
@@ -11,11 +16,11 @@ export const adminLogin = async (req, res)=>{
     try{
         const {email, password} = req.body;
 
-        if(email!== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASSWORD){
+        if(email!== ADMIN_EMAIL || password !== ADMIN_PASSWORD){
             return res.json({success: false, message: "Invalid Credentials"})
         }
 
-        const token = jwt.sign({email}, process.env.JWT_SECRET)
+        const token = jwt.sign({email}, JWT_SECRET)
         res.json({success: true, token})
     }catch(error){
         res.json({success: false, message: error.message})
@@ -33,19 +38,19 @@ export const googleLogin = async (req, res) => {
         // Google se token verify karein
         const ticket = await client.verifyIdToken({
             idToken: token,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: GOOGLE_CLIENT_ID,
         });
 
         const payload = ticket.getPayload();
         const { email } = payload;
 
         // Admin email check karein (.env se)
-        if (email !== process.env.ADMIN_EMAIL) {
+        if (email !== ADMIN_EMAIL) {
             return res.json({ success: false, message: "Unauthorized Admin Access!" });
         }
 
         // JWT token banayein
-        const adminToken = jwt.sign({ email }, process.env.JWT_SECRET);
+        const adminToken = jwt.sign({ email }, JWT_SECRET);
         res.json({ success: true, token: adminToken });
 
     } catch (error) {

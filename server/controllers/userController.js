@@ -2,7 +2,11 @@ import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import User from '../models/User.js';
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "363221562943-smiddvk5eqifmpj4b9gemki95k1a74i3.apps.googleusercontent.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "abhaysingh787569@gmail.com";
+const JWT_SECRET = process.env.JWT_SECRET || "JAI HIND";
+
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 export const userGoogleLogin = async (req, res) => {
     try {
@@ -11,13 +15,13 @@ export const userGoogleLogin = async (req, res) => {
         // 1. Google token verify
         const ticket = await client.verifyIdToken({
             idToken: token,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: GOOGLE_CLIENT_ID,
         });
 
         const payload = ticket.getPayload();
         const { sub, email, name, picture } = payload; 
 
-        const isAdminEmail = email && process.env.ADMIN_EMAIL && email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase();
+        const isAdminEmail = email && email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
         const assignedRole = isAdminEmail ? 'Admin' : 'Writer';
 
         // 2. Check existing user
@@ -41,7 +45,7 @@ export const userGoogleLogin = async (req, res) => {
         // 4. Create JWT token containing id, email, role, and name
         const userToken = jwt.sign(
             { id: user._id, email: user.email, name: user.name, role: user.role }, 
-            process.env.JWT_SECRET, 
+            JWT_SECRET, 
             { expiresIn: '7d' }
         );
 
