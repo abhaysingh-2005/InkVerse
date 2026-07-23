@@ -225,15 +225,18 @@ const Navbar = () => {
             </div>
 
             {/* Google OAuth Login */}
-            <div className="flex flex-col items-center justify-center gap-3 mb-6 bg-slate-950/60 p-5 rounded-2xl border border-slate-800">
+            <div className="flex flex-col items-center justify-center gap-3 mb-6 bg-slate-950/60 p-5 rounded-2xl border border-slate-800 text-center">
               <p className="text-xs font-semibold text-slate-300 mb-1">Sign in with Google</p>
               <GoogleLogin 
                 onSuccess={handleUserGoogleSuccess} 
-                onError={() => alert('Google Login Failed')}
+                onError={() => alert('Google Login Failed: Please check authorized JavaScript origins in Google Cloud Console.')}
                 theme="filled_blue"
                 shape="pill"
                 size="large"
               />
+              <p className="text-[11px] text-slate-400 mt-2">
+                <span className="text-amber-400 font-semibold">ℹ️ Live domain notice:</span> If Google displays <code className="text-amber-300">origin_mismatch</code> error, add your Vercel URL to Authorized Javascript Origins in Google Console, or use Quick Demo below.
+              </p>
             </div>
 
             <div className="flex items-center my-4 before:flex-1 before:border-t before:border-slate-800 after:flex-1 after:border-t after:border-slate-800">
