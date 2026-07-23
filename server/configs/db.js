@@ -7,7 +7,10 @@ const connectDB = async () => {
 
     try {
         const mongoUri = process.env.MONGODB_URI || "mongodb+srv://abhaysingh787569_db_user:m42AAVMJ8rVebKHk@blogcluster.qsndkn4.mongodb.net";
-        const connString = mongoUri.endsWith('/quickblog') ? mongoUri : `${mongoUri}/quickblog`;
+        let connString = mongoUri;
+        if (!connString.includes('/quickblog') && !connString.includes('?')) {
+            connString = `${connString}/quickblog`;
+        }
         await mongoose.connect(connString);
         console.log("Database Connected");
     } catch (error) {

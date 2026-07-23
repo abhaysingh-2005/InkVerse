@@ -16,27 +16,27 @@
 
 
 
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
 const auth = (req, res, next) => {
     const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
+    if (!authHeader) {
+        return res.json({ success: false, message: "Token missing, please login again" });
+    }
+
+    const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
 
     if (!token) {
-        return res.json({ success: false, message: "Token missing, please login again" })
+        return res.json({ success: false, message: "Token missing, please login again" });
     }
 
     try {
-        // Token decode karke decoded payload data nikalenge
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Decoded data ko req.user mein daal rahe hain taaki controller use kar sake
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "JAI HIND");
         req.user = decoded; 
-        
         next();
     } catch (error) {
-        res.json({ success: false, message: "Invalid token, please login again" })
+        res.json({ success: false, message: "Invalid or expired token, please login again" });
     }
-}
+};
 
 export default auth;

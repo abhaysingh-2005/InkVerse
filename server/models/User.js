@@ -10,10 +10,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    password: {
+        type: String
+    },
     googleId: {
         type: String,
-        required: true,
-        unique: true
+        sparse: true
     },
     picture: {
         type: String
@@ -21,7 +23,7 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: ['Admin', 'Writer'],
-        default: 'Writer' // Naye log login karte hi pehle Writer banenge
+        default: 'Writer'
     }
 }, { timestamps: true });
 
