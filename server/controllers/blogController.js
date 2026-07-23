@@ -1,5 +1,5 @@
 import fs from 'fs'
-import imageKit from '../configs/imagekit.js'
+import imageKit from '../configs/imageKit.js'
 import Blog from '../models/Blog.js';
 import Comment from '../models/Comment.js';
 import { generateAIContent } from '../configs/gemini.js';
