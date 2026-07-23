@@ -1,5 +1,5 @@
 import fs from 'fs'
-import imagekit from '../configs/imageKit.js'
+import imageKit from '../configs/imageKit.js'
 import Blog from '../models/Blog.js';
 import Comment from '../models/Comment.js';
 import { generateAIContent } from '../configs/gemini.js';
@@ -26,13 +26,13 @@ export const addBlog = async (req, res)=>{
 
         const fileBuffer = imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : null);
 
-        const response = await imagekit.upload({
+        const response = await imageKit.upload({
             file: fileBuffer,
             fileName: imageFile.originalname,
             folder:"/blogs"
         })
 
-        const optimizedImageUrl = imagekit.url({
+        const optimizedImageUrl = imageKit.url({
             path: response.filePath,
             transformation: [
                 {quality: 'auto'},
@@ -172,13 +172,13 @@ export const userAddBlog = async (req, res) => {
 
         const fileBuffer = imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : null);
 
-        const response = await imagekit.upload({
+        const response = await imageKit.upload({
             file: fileBuffer,
             fileName: imageFile.originalname,
             folder: "/blogs"
         })
 
-        const optimizedImageUrl = imagekit.url({
+        const optimizedImageUrl = imageKit.url({
             path: response.filePath,
             transformation: [
                 { quality: 'auto' },
@@ -261,12 +261,12 @@ export const updateBlogById = async (req, res) => {
 
         if (imageFile) {
             const fileBuffer = imageFile.buffer || (imageFile.path ? fs.readFileSync(imageFile.path) : null);
-            const response = await imagekit.upload({
+            const response = await imageKit.upload({
                 file: fileBuffer,
                 fileName: imageFile.originalname,
                 folder: "/blogs"
             });
-            const optimizedImageUrl = imagekit.url({
+            const optimizedImageUrl = imageKit.url({
                 path: response.filePath,
                 transformation: [
                     { quality: 'auto' },
