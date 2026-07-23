@@ -9,6 +9,7 @@ const Navbar = () => {
   const { axios } = useAppContext(); 
   
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') !== 'light';
   });
@@ -39,6 +40,7 @@ const Navbar = () => {
               localStorage.setItem('userEmail', data.user.email || '');
               localStorage.setItem('userRole', data.user.role || 'Writer');
 
+              setShowAuthModal(false);
               if (data.user.role === 'Admin') {
                 localStorage.setItem('token', data.token);
                 navigate('/');
@@ -58,6 +60,29 @@ const Navbar = () => {
       } catch (error) {
           alert(error.message);
       }
+  };
+
+  const handleDemoLogin = (role) => {
+    const isDemoAdmin = role === 'Admin';
+    const demoToken = 'demo-jwt-token-' + Date.now();
+    const demoName = isDemoAdmin ? 'Demo Admin' : 'Demo Writer';
+    const demoEmail = isDemoAdmin ? 'abhaysingh787569@gmail.com' : 'demo@inkverse.com';
+    const demoImage = isDemoAdmin 
+      ? 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin' 
+      : 'https://api.dicebear.com/7.x/adventurer/svg?seed=writer';
+
+    localStorage.setItem('userToken', demoToken);
+    localStorage.setItem('userName', demoName);
+    localStorage.setItem('userEmail', demoEmail);
+    localStorage.setItem('userImage', demoImage);
+    localStorage.setItem('userRole', role);
+    if (isDemoAdmin) {
+      localStorage.setItem('token', demoToken);
+    }
+
+    setShowAuthModal(false);
+    navigate(isDemoAdmin ? '/admin' : '/dashboard');
+    window.location.reload();
   };
 
   return (
@@ -86,19 +111,14 @@ const Navbar = () => {
             {isDarkMode ? '🌙' : '☀️'}
           </button>
 
-          {/* Unified SINGLE Sign In Button when NOT logged in */}
+          {/* Sign In Button when NOT logged in */}
           {!hasUserToken ? (
-            <div className="relative inline-block overflow-hidden rounded-xl cursor-pointer h-[40px] px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2">
-              <span className="z-10 flex items-center gap-1.5 pointer-events-none">
-                <span>✨</span> Sign In / Join
-              </span>
-              <div className="absolute inset-0 opacity-0 scale-150 origin-center cursor-pointer z-20">
-                <GoogleLogin 
-                  onSuccess={handleUserGoogleSuccess} 
-                  onError={() => alert('Google Login Failed')}
-                />
-              </div>
-            </div>
+            <button 
+              onClick={() => setShowAuthModal(true)}
+              className="rounded-xl cursor-pointer h-[40px] px-6 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2"
+            >
+              <span>✨</span> Sign In / Join
+            </button>
           ) : (
             /* Logged In User / Admin Dropdown */
             <div className="relative">
@@ -141,6 +161,18 @@ const Navbar = () => {
                     📊 My Dashboard
                   </button>
 
+                  {userRole === 'Admin' && (
+                    <button 
+                      onClick={() => {
+                        setShowDropdown(false);
+                        navigate('/admin');
+                      }}
+                      className="w-full text-left px-4 py-2.5 hover:bg-slate-800 text-purple-300 font-bold flex items-center gap-2 transition cursor-pointer"
+                    >
+                      🛡️ Admin Panel
+                    </button>
+                  )}
+
                   <button 
                     onClick={() => {
                       setShowDropdown(false);
@@ -173,6 +205,59 @@ const Navbar = () => {
           )}
         </div>
       </div>
+
+      {/* Sign In Modal */}
+      {showAuthModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 sm:p-8 text-slate-100 shadow-2xl relative animate-in fade-in duration-200">
+            <button
+              onClick={() => setShowAuthModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer"
+            >
+              ✕
+            </button>
+
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-extrabold text-white flex items-center justify-center gap-2">
+                <span>✨</span> Welcome to InkVerse
+              </h3>
+              <p className="text-xs text-slate-400 mt-1.5">Sign in to create, publish, and manage your articles</p>
+            </div>
+
+            {/* Google OAuth Login */}
+            <div className="flex flex-col items-center justify-center gap-3 mb-6 bg-slate-950/60 p-5 rounded-2xl border border-slate-800">
+              <p className="text-xs font-semibold text-slate-300 mb-1">Sign in with Google</p>
+              <GoogleLogin 
+                onSuccess={handleUserGoogleSuccess} 
+                onError={() => alert('Google Login Failed')}
+                theme="filled_blue"
+                shape="pill"
+                size="large"
+              />
+            </div>
+
+            <div className="flex items-center my-4 before:flex-1 before:border-t before:border-slate-800 after:flex-1 after:border-t after:border-slate-800">
+              <p className="mx-3 text-center font-semibold text-slate-500 text-xs">OR QUICK DEMO</p>
+            </div>
+
+            {/* Quick Demo Login Options */}
+            <div className="space-y-3">
+              <button
+                onClick={() => handleDemoLogin('Writer')}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs py-3 rounded-xl border border-slate-700 transition cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>✍️</span> Continue as Demo Writer
+              </button>
+              <button
+                onClick={() => handleDemoLogin('Admin')}
+                className="w-full bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 font-semibold text-xs py-3 rounded-xl border border-indigo-500/40 transition cursor-pointer flex items-center justify-center gap-2"
+              >
+                <span>🛡️</span> Continue as Demo Admin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

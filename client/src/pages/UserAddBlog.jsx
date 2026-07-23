@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 const UserAddBlog = () => {
   const navigate = useNavigate();
-  const { axios } = useAppContext();
+  const { axios, refreshBlogs } = useAppContext();
   const [isAdding, setIsAdding] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -75,6 +75,7 @@ const UserAddBlog = () => {
 
       if (data.success) {
         toast.success(data.message || "Blog created successfully!");
+        await refreshBlogs();
         navigate('/dashboard');
       } else {
         toast.error(data.message);

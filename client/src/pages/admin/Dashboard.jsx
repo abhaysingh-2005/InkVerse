@@ -15,11 +15,11 @@ const Dashboard = () => {
         recentBlogs: []
     })
 
-    const { axios, token } = useAppContext();
+    const { axios, token, refreshTrigger } = useAppContext();
 
     // 👈 3. Yeh Security Check bina sign-in ke entry block karega
     useEffect(() => {
-        const activeToken = token || localStorage.getItem('userToken'); 
+        const activeToken = token || localStorage.getItem('userToken') || localStorage.getItem('token'); 
         
         if (!activeToken) {
             alert("Access Denied! Please login first.");
@@ -29,7 +29,7 @@ const Dashboard = () => {
 
     const fetchDashboard = async ()=>{
         try {
-            const activeToken = token || localStorage.getItem('userToken'); // 👈 userToken lagaya yahan bhi
+            const activeToken = token || localStorage.getItem('userToken') || localStorage.getItem('token'); // 👈 userToken lagaya yahan bhi
             if(!activeToken) return;
             const { data } = await axios.get('/api/admin/dashboard',{
                 headers:{
@@ -43,11 +43,11 @@ const Dashboard = () => {
     }
 
     useEffect(()=>{
-        const activeToken = token || localStorage.getItem('userToken');
+        const activeToken = token || localStorage.getItem('userToken') || localStorage.getItem('token');
         if (activeToken) {
             fetchDashboard();
         }
-    },[token])
+    },[token, refreshTrigger])
 
   return (
     <div className='flex-1 p-4 md:p-10 bg-blue-50/50'>

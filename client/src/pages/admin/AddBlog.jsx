@@ -7,7 +7,7 @@ import { parse } from 'marked'
 
 const AddBlog = () => {
 
-  const { axios, token } = useAppContext()
+  const { axios, token, refreshBlogs } = useAppContext()
   const [isAdding, setIsAdding] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -68,10 +68,11 @@ const AddBlog = () => {
         setImage(false)
         setTitle('')
         setSubTitle('')
-        quillRef.current.root.innerHTML = ''
+        if (quillRef.current) quillRef.current.root.innerHTML = ''
         setCategory('Startup')
         setIsPublished(false)
         setAuthor('') // 👈 Form clear hone par reset ho raha hai
+        await refreshBlogs();
       } else {
         toast.error(data.message)
       }

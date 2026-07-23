@@ -213,14 +213,7 @@ export const getUserBlogs = async (req, res) => {
 
         let query = {};
         if (userRole === 'Admin' || (userName && userName.toLowerCase().includes('admin'))) {
-            query = { 
-                $or: [
-                    { author: { $regex: /^admin$/i } }, 
-                    { author: "Admin" }, 
-                    { author: "Anonymous" },
-                    { author: { $regex: new RegExp(`^${(userName || 'Admin').trim()}$`, 'i') } }
-                ] 
-            };
+            query = {}; // Admin has access to view all blogs
         } else if (userName) {
             query = { author: { $regex: new RegExp(`^${userName.trim()}$`, 'i') } };
         }

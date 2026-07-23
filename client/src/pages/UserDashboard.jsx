@@ -7,7 +7,7 @@ import EditBlogModal from '../components/EditBlogModal';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
-  const { blogs: allBlogs, axios } = useAppContext();
+  const { blogs: allBlogs, axios, refreshTrigger, fetchBlogs, refreshBlogs } = useAppContext();
   const [myBlogs, setMyBlogs] = useState([]);
   const [savedBlogs, setSavedBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,19 +22,23 @@ const UserDashboard = () => {
   const fetchUserBlogs = async () => {
     try {
       setLoading(true);
+      const activeRole = localStorage.getItem('userRole') || userRole;
+      const activeName = localStorage.getItem('userName') || currentUserName;
+      const activeToken = localStorage.getItem('userToken') || localStorage.getItem('token') || userToken;
+
       const { data } = await axios.get('/api/blog/user-blogs', {
-        params: { userName: currentUserName, userRole: userRole },
-        headers: { Authorization: `Bearer ${userToken}` }
+        params: { userName: activeName, userRole: activeRole },
+        headers: { Authorization: `Bearer ${activeToken}` }
       });
       
       if (data.success) {
-        if (userRole === 'Admin') {
+        if (activeRole === 'Admin') {
           // Admin Dashboard displays all Admin and Anonymous authored posts
           setMyBlogs(data.blogs);
         } else {
           // Regular user dashboard displays only posts written by that user
           const userOnlyBlogs = data.blogs.filter(
-            (b) => b.author && currentUserName && b.author.trim().toLowerCase() === currentUserName.trim().toLowerCase()
+            (b) => b.author && activeName && b.author.trim().toLowerCase() === activeName.trim().toLowerCase()
           );
           setMyBlogs(userOnlyBlogs);
         }
@@ -54,7 +58,8 @@ const UserDashboard = () => {
 
   useEffect(() => {
     fetchUserBlogs();
-  }, [userToken, currentUserName]);
+    fetchBlogs();
+  }, [userToken, currentUserName, refreshTrigger]);
 
   useEffect(() => {
     loadSavedBlogs();

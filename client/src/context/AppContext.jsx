@@ -16,6 +16,7 @@ export const AppProvider = ({ children })=>{
     const [token, setToken] = useState(null)
     const [blogs, setBlogs] = useState([])
     const [input, setInput] = useState("")
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const fetchBlogs = async () => {
         try {
@@ -25,6 +26,11 @@ export const AppProvider = ({ children })=>{
             toast.error(error.message)
         }
     }
+
+    const refreshBlogs = async () => {
+        await fetchBlogs();
+        setRefreshTrigger(prev => prev + 1);
+    };
 
     useEffect(()=>{
         fetchBlogs();
@@ -38,7 +44,7 @@ export const AppProvider = ({ children })=>{
 
 
     const value ={
-        axios, navigate, token, setToken, blogs, setBlogs, input, setInput
+        axios, navigate, token, setToken, blogs, setBlogs, input, setInput, fetchBlogs, refreshTrigger, refreshBlogs
     }
 
     return (
